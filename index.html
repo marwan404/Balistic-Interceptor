@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ballistic Command Ultra</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    BALLISTIC COMMAND <span class="logo-badge">ULTRA V5</span>
+  </div>
+  <div class="header-status">
+    <span class="status-dot">PHYSICS ENGINE ACTIVE</span>
+    <span id="h-count" style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim)">OBJECTS: 0</span>
+    <span id="h-time" style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim)">T+0.00s</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+
+    <!-- Mission -->
+    <div class="panel">
+      <div class="panel-title">Mission <span class="panel-title-accent">MODE</span></div>
+      <select id="mission">
+        <option value="free">Free Flight</option>
+        <option value="intercept">Static Target Intercept</option>
+        <option value="evasive">Evasive Target Maneuver</option>
+      </select>
+      <button id="btn-auto" class="btn-success" onclick="runAutoAim()">⚡ Execute Auto-Aim</button>
+      <div id="ai-computing">COMPUTING INTERCEPT...</div>
+    </div>
+
+    <!-- Launch config -->
+    <div class="panel">
+      <div class="panel-title">Launch <span class="panel-title-accent">CONFIG</span></div>
+
+      <div class="ctrl">
+        <label>Altitude h₀ <span class="val" id="v-h0">0 m</span></label>
+        <input type="range" id="sl-h0" min="0" max="150" value="0">
+      </div>
+      <div class="ctrl">
+        <label>Pitch Angle θ <span class="val" id="v-ang">45°</span></label>
+        <input type="range" id="sl-ang" min="1" max="89" value="45">
+      </div>
+      <div class="ctrl">
+        <label>Velocity V₀ <span class="val" id="v-v0">60 m/s</span></label>
+        <input type="range" id="sl-v0" min="5" max="300" value="60">
+      </div>
+      <div class="ctrl">
+        <label>Bounciness <span class="val" id="v-bounce">0.00</span></label>
+        <input type="range" id="sl-bounce" min="0" max="0.95" step="0.05" value="0">
+      </div>
+
+      <div class="btn-grid">
+        <button class="btn-primary" onclick="launch()">🚀 FIRE</button>
+        <button onclick="launchVolley()">SALVO ×5</button>
+        <button id="btn-slow" onclick="toggleSlow()" style="font-size:0.62rem;">SLOW-MO</button>
+        <button class="btn-danger" onclick="reset()">RESET</button>
+      </div>
+    </div>
+
+    <!-- Atmosphere -->
+    <div class="panel">
+      <div class="panel-title">Atmosphere <span class="panel-title-accent">PARAMS</span></div>
+
+      <div class="ctrl">
+        <label>Wind <span class="val" id="v-wind">0 m/s</span></label>
+        <input type="range" id="sl-wind" min="-40" max="40" value="0">
+      </div>
+      <div class="ctrl">
+        <label>Drag Cd <span class="val" id="v-cd">0.47</span></label>
+        <input type="range" id="sl-cd" min="0" max="2" step="0.01" value="0.47">
+      </div>
+      <div class="ctrl">
+        <label>Air Density ρ <span class="val" id="v-rho">1.225</span></label>
+        <input type="range" id="sl-rho" min="0" max="5" step="0.001" value="1.225">
+      </div>
+      <div class="ctrl">
+        <label>Gravity g <span class="val" id="v-g">9.81 m/s²</span></label>
+        <input type="range" id="sl-g" min="0.5" max="30" step="0.01" value="9.81">
+      </div>
+
+      <select id="preset">
+        <option value="">— Planet Preset —</option>
+        <option value="earth">🌍 Earth (Standard)</option>
+        <option value="moon">🌕 Moon (Vacuum)</option>
+        <option value="mars">🔴 Mars (Thin Atm.)</option>
+        <option value="jupiter">🪐 Jupiter (Dense)</option>
+        <option value="vacuum">✨ Pure Vacuum</option>
+      </select>
+    </div>
+
+    <!-- Display -->
+    <div class="panel">
+      <div class="panel-title">Display <span class="panel-title-accent">OPTIONS</span></div>
+      <label class="toggle-row"><input type="checkbox" id="tog-preview" checked> Ghost preview</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-trace" checked> Trajectory trace</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-speed" checked> Speed color coding</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-vectors"> Force vectors</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-particles" checked> Particles & FX</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-grid" checked> Adaptive grid</label>
+      <label class="toggle-row"><input type="checkbox" id="tog-rocket" checked> Rocket art</label>
+    </div>
+
+    <!-- Physics ODE box -->
+    <div class="panel">
+      <div class="panel-title">Physics <span class="panel-title-accent">ODE</span></div>
+      <div class="physics-box">
+        <span class="hl">// Euler integration</span><br>
+        <span class="eq">Fd = ½ρv²·Cd·A</span><br>
+        <span class="eq">ax = (Fd_x + Fw) / m</span><br>
+        <span class="eq">ay = (Fd_y / m) − g</span><br>
+        <span class="eq">x += vx·dt, y += vy·dt</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── VIEWPORT ── -->
+  <div class="viewport">
+    <canvas id="sim"></canvas>
+
+    <!-- HUD -->
+    <div class="hud" id="hud">
+      <div class="hud-row">TARGET_STATUS: <span class="hv" id="h-status" style="color:var(--text-dim)">NO_TARGET</span></div>
+      <div class="hud-row">ALT_MAX: <span class="hv" id="h-alt">0.0</span> m</div>
+      <div class="hud-row">RANGE: <span class="hv" id="h-range">0.0</span> m</div>
+      <div class="hud-row">VEL_X: <span class="hv" id="h-vx">0.0</span> m/s</div>
+      <div class="hud-row">VEL_Y: <span class="hv" id="h-vy">0.0</span> m/s</div>
+      <div class="hud-row">SIM_TIME: <span class="hv" id="h-simtime">0.0</span> s</div>
+    </div>
+
+    <!-- AI overlay -->
+    <div class="ai-panel">
+      <div id="ai-computing"></div>
+    </div>
+
+    <!-- Hit banner -->
+    <div id="hit-banner">TARGET ELIMINATED</div>
+
+    <!-- Vector legend -->
+    <div class="vec-legend" id="vec-legend" style="display:none;">
+      <div class="vec-item"><div class="vec-swatch" style="background:#10c97e"></div> VEL</div>
+      <div class="vec-item"><div class="vec-swatch" style="background:#f05050"></div> DRAG</div>
+      <div class="vec-item"><div class="vec-swatch" style="background:#f59e0b"></div> GRAV</div>
+    </div>
+
+    <!-- Cam badge -->
+    <div class="cam-badge">AUTO-TRACK</div>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-label">Max Height</div><div><span class="stat-val" id="st-maxh">—</span> <span class="stat-unit">m</span></div></div>
+      <div class="stat"><div class="stat-label">Ground Range</div><div><span class="stat-val" id="st-range">—</span> <span class="stat-unit">m</span></div></div>
+      <div class="stat"><div class="stat-label">Flight Time</div><div><span class="stat-val" id="st-time">—</span> <span class="stat-unit">s</span></div></div>
+      <div class="stat"><div class="stat-label">Peak Speed</div><div><span class="stat-val" id="st-spd">—</span> <span class="stat-unit">m/s</span></div></div>
+    </div>
+
+    <!-- Graphs row -->
+    <div class="graphs-row">
+      <div class="graph-wrap"><div class="graph-label">Vy / time</div><canvas id="g-vy"></canvas></div>
+      <div class="graph-wrap"><div class="graph-label">Vx / time</div><canvas id="g-vx"></canvas></div>
+      <div class="graph-wrap"><div class="graph-label">Height / dist</div><canvas id="g-hd"></canvas></div>
+      <div class="graph-wrap"><div class="graph-label">Speed / time</div><canvas id="g-sp"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
