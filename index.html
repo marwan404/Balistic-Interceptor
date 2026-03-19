@@ -9,177 +9,177 @@
 <body>
 
     <div class="header">
-        <div class="logo">BALLISTIC COMMAND <span class="logo-badge">ULTRA V5</span></div>
-        <button id="sidebar-toggle" onclick="toggleSidebar()">&#9776; CONTROLS</button>
-        <div class="header-status">
-            <span class="status-dot">PHYSICS ENGINE ACTIVE</span>
-            <span id="h-count" style="font-family:var(--mono);font-size:.65rem;color:var(--text-dim)">ROCKETS: 0</span>
-            <span id="h-time" style="font-family:var(--mono);font-size:.65rem;color:var(--text-dim)">T+0.00s</span>
-        </div>
+      <div class="logo">BALLISTIC COMMAND <span class="logo-badge">ULTRA V5</span></div>
+      <button id="sidebar-toggle" onclick="toggleSidebar()">&#9776; CONTROLS</button>
+      <div class="header-status">
+        <span class="status-dot">PHYSICS ENGINE ACTIVE</span>
+        <span id="h-count" style="font-family:var(--mono);font-size:.65rem;color:var(--text-dim)">ROCKETS: 0</span>
+        <span id="h-time" style="font-family:var(--mono);font-size:.65rem;color:var(--text-dim)">T+0.00s</span>
+      </div>
     </div>
 
     <div class="main">
-        <div class="sidebar" id="sidebar">
-            <div id="drawer-handle"></div>
-            <div class="sidebar-inner">
+      <div class="sidebar" id="sidebar">
+      <div id="drawer-handle"></div>
+      <div class="sidebar-inner">
 
-                <div class="panel" id="sidebar-mission-panel">
-                    <select id="mission">
-                        <option value="free">Free Flight</option>
-                        <option value="intercept">Static Target Intercept</option>
-                        <option value="evasive">Base Defense — Incoming Missile</option>
-                    </select>
-                    <button id="btn-auto" class="btn-success" onclick="runAutoAim()">&#9889; Execute Auto-Aim</button>
-                    <div id="ai-msg">COMPUTING INTERCEPT...</div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">Launch <span class="panel-title-accent">CONFIG</span></div>
-                    <div class="ctrl"><label>Altitude h&#8320; <span class="val" id="v-h0">0 m</span></label><input type="range" id="sl-h0" min="0" max="150" value="0"></div>
-                    <div class="ctrl"><label>Pitch Angle &#952; <span class="val" id="v-ang">45&#176;</span></label><input type="range" id="sl-ang" min="1" max="89" value="45"></div>
-                    <div class="ctrl"><label>Velocity V&#8320; <span class="val" id="v-v0">60 m/s</span></label><input type="range" id="sl-v0" min="5" max="300" value="60"></div>
-                    <div class="ctrl"><label>Bounciness <span class="val" id="v-bounce">0.00</span></label><input type="range" id="sl-bounce" min="0" max="0.95" step="0.05" value="0"></div>
-                    <div class="btn-grid">
-                        <button class="btn-primary" onclick="launch()">&#128640; FIRE</button>
-                        <button onclick="launchVolley()">SALVO &#215;5</button>
-                        <button id="btn-pause" onclick="togglePause()" style="font-size:.62rem;">&#9646;&#9646; PAUSE</button>
-                        <button id="btn-slow" onclick="toggleSlow()" style="font-size:.62rem;">SLOW-MO</button>
-                        <button id="btn-follow" onclick="toggleFollow()" style="font-size:.62rem;grid-column:1/-1;">&#9654; FOLLOW ROCKET</button>
-                        <button class="btn-danger" onclick="reset()" style="grid-column:1/-1;">RESET</button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">Atmosphere <span class="panel-title-accent">PARAMS</span></div>
-                    <div class="ctrl"><label>Wind <span class="val" id="v-wind">0 m/s</span></label><input type="range" id="sl-wind" min="-40" max="40" value="0"></div>
-                    <div class="ctrl"><label>Drag Cd <span class="val" id="v-cd">0.47</span></label><input type="range" id="sl-cd" min="0" max="2" step="0.01" value="0.47"></div>
-                    <div class="ctrl"><label>Air Density &#961; <span class="val" id="v-rho">1.225</span></label><input type="range" id="sl-rho" min="0" max="5" step="0.001" value="1.225"></div>
-                    <div class="ctrl"><label>Gravity g <span class="val" id="v-g">9.81 m/s&#178;</span></label><input type="range" id="sl-g" min="0.5" max="30" step="0.01" value="9.81"></div>
-                    <select id="preset">
-                        <option value="">&#8212; Planet Preset &#8212;</option>
-                        <option value="earth">Earth (Standard)</option>
-                        <option value="moon">Moon (Vacuum)</option>
-                        <option value="mars">Mars (Thin Atm.)</option>
-                        <option value="jupiter">Jupiter (Dense)</option>
-                        <option value="vacuum">Pure Vacuum</option>
-                    </select>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">Display <span class="panel-title-accent">OPTIONS</span></div>
-                    <label class="toggle-row"><input type="checkbox" id="tog-preview" checked> Ghost preview</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-trace" checked> Trajectory trace</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-speed" checked> Speed color coding</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-vectors"> Force vectors</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-particles" checked> Particles &amp; FX</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-grid" checked> Adaptive grid</label>
-                    <label class="toggle-row"><input type="checkbox" id="tog-rocket" checked> Rocket art</label>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">Physics <span class="panel-title-accent">ODE</span></div>
-                    <div class="physics-box">
-                        <span class="hl">// Euler integration</span><br>
-                        <span class="eq">Fd = &#189;&#961;v&#178;&#183;Cd&#183;A</span><br>
-                        <span class="eq">ax = (Fd_x + Fw) / m</span><br>
-                        <span class="eq">ay = (Fd_y / m) &#8722; g</span><br>
-                        <span class="eq">x += vx&#183;dt, y += vy&#183;dt</span>
-                    </div>
-                </div>
-
-            </div><!-- /sidebar-inner -->
-        </div><!-- /sidebar -->
-
-        <div id="sidebar-resizer"></div>
-
-        <div class="viewport">
-            <canvas id="sim"></canvas>
-
-            <div class="hud">
-                <div class="hud-row">TARGET_STATUS: <span class="hv" id="h-status" style="color:var(--text-dim)">NO_TARGET</span></div>
-                <div class="hud-row">ALT_MAX: <span class="hv" id="h-alt">0.0</span> m</div>
-                <div class="hud-row">RANGE: <span class="hv" id="h-range">0.0</span> m</div>
-                <div class="hud-row">VEL_X: <span class="hv" id="h-vx">0.0</span> m/s</div>
-                <div class="hud-row">VEL_Y: <span class="hv" id="h-vy">0.0</span> m/s</div>
-                <div class="hud-row">ROCKETS_ACTIVE: <span class="hv" id="h-rcount">0</span></div>
-            </div>
-
-            <div class="ai-panel">
-                <button id="btn-auto"></button>
-                <div id="ai-msg"></div>
-            </div>
-
-            <div id="hit-banner">TARGET ELIMINATED</div>
-
-            <!-- Base Destroyed -->
-            <div id="base-screen">
-                <div class="bs-icon"></div>
-                <div class="bs-title">BASE DESTROYED</div>
-                <div class="bs-sub">THE ENEMY MISSILE REACHED YOUR POSITION</div>
-                <div class="bs-kills" id="bs-kills-txt"></div>
-                <button class="bs-btn" onclick="restartMission()">RESTART MISSION</button>
-            </div>
-
-            <div class="vec-legend" id="vec-legend" style="display:none;">
-                <div class="vec-item"><div class="vec-swatch" style="background:#10c97e"></div>VEL</div>
-                <div class="vec-item"><div class="vec-swatch" style="background:#f05050"></div>DRAG</div>
-                <div class="vec-item"><div class="vec-swatch" style="background:#f59e0b"></div>GRAV</div>
-            </div>
-
-            <!-- Pause overlay -->
-            <div id="pause-overlay" style="display:none;position:absolute;inset:0;background:rgba(4,6,10,.55);display:none;align-items:center;justify-content:center;pointer-events:none;">
-                <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:#fff;letter-spacing:.2em;opacity:.9;text-shadow:0 2px 20px rgba(0,0,0,.8);">&#9646;&#9646; PAUSED</div>
-            </div>
-
-            <!-- Bottom-right badges -->
-            <div style="position:absolute;bottom:12px;right:12px;display:flex;gap:6px;align-items:center;">
-                <div id="follow-badge" style="display:none;font-family:var(--mono);font-size:.58rem;color:var(--amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:3px 8px;cursor:pointer;user-select:none;transition:background .15s;" onclick="toggleFollow()">&#9654; FOLLOWING</div>
-                <div class="cam-badge" id="cam-badge" onclick="toggleAutoTrack()">AUTO-TRACK</div>
-            </div>
-
-            <!-- Mobile action bar — always visible on small screens -->
-            <div id="mobile-bar">
-                <div id="mobile-bar-row1">
-                    <select id="mission-mob" onchange="document.getElementById('mission').value=this.value;document.getElementById('mission').dispatchEvent(new Event('change'))">
-                        <option value="free">Free Flight</option>
-                        <option value="intercept">Static Intercept</option>
-                        <option value="evasive">Base Defense</option>
-                    </select>
-                    <button id="mobile-bar-btn-auto" class="btn-success" style="display:none;" onclick="runAutoAim()">&#9889; Auto-Aim</button>
-                </div>
-                <div id="mobile-bar-row2">
-                    <button class="btn-primary" onclick="launch()">&#128640; FIRE</button>
-                    <button onclick="launchVolley()">SALVO &#215;5</button>
-                    <button id="mobile-btn-pause" onclick="togglePause()" >&#9646;&#9646; PAUSE</button>
-                </div>
-            </div>
-
-            <div class="stats-bar">
-                <div class="stat"><div class="stat-label">Max Height</div><div><span class="stat-val" id="st-maxh">&#8212;</span> <span class="stat-unit">m</span></div></div>
-                <div class="stat"><div class="stat-label">Ground Range</div><div><span class="stat-val" id="st-range">&#8212;</span> <span class="stat-unit">m</span></div></div>
-                <div class="stat"><div class="stat-label">Flight Time</div><div><span class="stat-val" id="st-time">&#8212;</span> <span class="stat-unit">s</span></div></div>
-                <div class="stat"><div class="stat-label">Intercepted</div><div><span class="stat-val" id="st-kills">0</span></div></div>
-            </div>
-
-            <div class="graphs-row">
-                <div class="graph-wrap" onclick="openGraph('g-vy')"><div class="graph-label">Vy / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-vy"></canvas></div>
-                <div class="graph-wrap" onclick="openGraph('g-vx')"><div class="graph-label">Vx / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-vx"></canvas></div>
-                <div class="graph-wrap" onclick="openGraph('g-hd')"><div class="graph-label">Height / dist</div><div class="graph-expand">&#x26F6;</div><canvas id="g-hd"></canvas></div>
-                <div class="graph-wrap" onclick="openGraph('g-sp')"><div class="graph-label">Speed / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-sp"></canvas></div>
-            </div>
+        <div class="panel" id="sidebar-mission-panel">
+          <select id="mission">
+            <option value="free">Free Flight</option>
+            <option value="intercept">Static Target Intercept</option>
+            <option value="evasive">Base Defense — Incoming Missile</option>
+          </select>
+          <button id="btn-auto" class="btn-success" onclick="runAutoAim()">&#9889; Execute Auto-Aim</button>
+          <div id="ai-msg">COMPUTING INTERCEPT...</div>
         </div>
+
+        <div class="panel">
+          <div class="panel-title">Launch <span class="panel-title-accent">CONFIG</span></div>
+          <div class="ctrl"><label>Altitude h&#8320; <span class="val" id="v-h0">0 m</span></label><input type="range" id="sl-h0" min="0" max="150" value="0"></div>
+          <div class="ctrl"><label>Pitch Angle &#952; <span class="val" id="v-ang">45&#176;</span></label><input type="range" id="sl-ang" min="1" max="89" value="45"></div>
+          <div class="ctrl"><label>Velocity V&#8320; <span class="val" id="v-v0">60 m/s</span></label><input type="range" id="sl-v0" min="5" max="300" value="60"></div>
+          <div class="ctrl"><label>Bounciness <span class="val" id="v-bounce">0.00</span></label><input type="range" id="sl-bounce" min="0" max="0.95" step="0.05" value="0"></div>
+          <div class="btn-grid">
+            <button class="btn-primary" onclick="launch()">&#128640; FIRE</button>
+            <button onclick="launchVolley()">SALVO &#215;5</button>
+            <button id="btn-pause" onclick="togglePause()" style="font-size:.62rem;">&#9646;&#9646; PAUSE</button>
+            <button id="btn-slow" onclick="toggleSlow()" style="font-size:.62rem;">SLOW-MO</button>
+            <button id="btn-follow" onclick="toggleFollow()" style="font-size:.62rem;grid-column:1/-1;">&#9654; FOLLOW ROCKET</button>
+            <button class="btn-danger" onclick="reset()" style="grid-column:1/-1;">RESET</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Atmosphere <span class="panel-title-accent">PARAMS</span></div>
+          <div class="ctrl"><label>Wind <span class="val" id="v-wind">0 m/s</span></label><input type="range" id="sl-wind" min="-40" max="40" value="0"></div>
+          <div class="ctrl"><label>Drag Cd <span class="val" id="v-cd">0.47</span></label><input type="range" id="sl-cd" min="0" max="2" step="0.01" value="0.47"></div>
+          <div class="ctrl"><label>Air Density &#961; <span class="val" id="v-rho">1.225</span></label><input type="range" id="sl-rho" min="0" max="5" step="0.001" value="1.225"></div>
+          <div class="ctrl"><label>Gravity g <span class="val" id="v-g">9.81 m/s&#178;</span></label><input type="range" id="sl-g" min="0.5" max="30" step="0.01" value="9.81"></div>
+          <select id="preset">
+            <option value="">&#8212; Planet Preset &#8212;</option>
+            <option value="earth">Earth (Standard)</option>
+            <option value="moon">Moon (Vacuum)</option>
+            <option value="mars">Mars (Thin Atm.)</option>
+            <option value="jupiter">Jupiter (Dense)</option>
+            <option value="vacuum">Pure Vacuum</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Display <span class="panel-title-accent">OPTIONS</span></div>
+          <label class="toggle-row"><input type="checkbox" id="tog-preview" checked> Ghost preview</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-trace" checked> Trajectory trace</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-speed" checked> Speed color coding</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-vectors"> Force vectors</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-particles" checked> Particles &amp; FX</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-grid" checked> Adaptive grid</label>
+          <label class="toggle-row"><input type="checkbox" id="tog-rocket" checked> Rocket art</label>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Physics <span class="panel-title-accent">ODE</span></div>
+          <div class="physics-box">
+            <span class="hl">// Euler integration</span><br>
+            <span class="eq">Fd = &#189;&#961;v&#178;&#183;Cd&#183;A</span><br>
+            <span class="eq">ax = (Fd_x + Fw) / m</span><br>
+            <span class="eq">ay = (Fd_y / m) &#8722; g</span><br>
+            <span class="eq">x += vx&#183;dt, y += vy&#183;dt</span>
+          </div>
+        </div>
+
+      </div><!-- /sidebar-inner -->
+      </div><!-- /sidebar -->
+
+      <div id="sidebar-resizer"></div>
+
+      <div class="viewport">
+        <canvas id="sim"></canvas>
+
+        <div class="hud">
+          <div class="hud-row">TARGET_STATUS: <span class="hv" id="h-status" style="color:var(--text-dim)">NO_TARGET</span></div>
+          <div class="hud-row">ALT_MAX: <span class="hv" id="h-alt">0.0</span> m</div>
+          <div class="hud-row">RANGE: <span class="hv" id="h-range">0.0</span> m</div>
+          <div class="hud-row">VEL_X: <span class="hv" id="h-vx">0.0</span> m/s</div>
+          <div class="hud-row">VEL_Y: <span class="hv" id="h-vy">0.0</span> m/s</div>
+          <div class="hud-row">ROCKETS_ACTIVE: <span class="hv" id="h-rcount">0</span></div>
+        </div>
+
+        <div class="ai-panel">
+          <button id="btn-auto"></button>
+          <div id="ai-msg"></div>
+        </div>
+
+        <div id="hit-banner">TARGET ELIMINATED</div>
+
+        <!-- Base Destroyed -->
+        <div id="base-screen">
+          <div class="bs-icon"></div>
+          <div class="bs-title">BASE DESTROYED</div>
+          <div class="bs-sub">THE ENEMY MISSILE REACHED YOUR POSITION</div>
+          <div class="bs-kills" id="bs-kills-txt"></div>
+          <button class="bs-btn" onclick="restartMission()">RESTART MISSION</button>
+        </div>
+
+        <div class="vec-legend" id="vec-legend" style="display:none;">
+          <div class="vec-item"><div class="vec-swatch" style="background:#10c97e"></div>VEL</div>
+          <div class="vec-item"><div class="vec-swatch" style="background:#f05050"></div>DRAG</div>
+          <div class="vec-item"><div class="vec-swatch" style="background:#f59e0b"></div>GRAV</div>
+        </div>
+
+        <!-- Pause overlay -->
+        <div id="pause-overlay" style="display:none;position:absolute;inset:0;background:rgba(4,6,10,.55);display:none;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:#fff;letter-spacing:.2em;opacity:.9;text-shadow:0 2px 20px rgba(0,0,0,.8);">&#9646;&#9646; PAUSED</div>
+        </div>
+
+        <!-- Bottom-right badges -->
+        <div style="position:absolute;bottom:12px;right:12px;display:flex;gap:6px;align-items:center;">
+          <div id="follow-badge" style="display:none;font-family:var(--mono);font-size:.58rem;color:var(--amber);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:3px 8px;cursor:pointer;user-select:none;transition:background .15s;" onclick="toggleFollow()">&#9654; FOLLOWING</div>
+          <div class="cam-badge" id="cam-badge" onclick="toggleAutoTrack()">AUTO-TRACK</div>
+        </div>
+
+        <!-- Mobile action bar — always visible on small screens -->
+        <div id="mobile-bar">
+          <div id="mobile-bar-row1">
+            <select id="mission-mob" onchange="document.getElementById('mission').value=this.value;document.getElementById('mission').dispatchEvent(new Event('change'))">
+              <option value="free">Free Flight</option>
+              <option value="intercept">Static Intercept</option>
+              <option value="evasive">Base Defense</option>
+            </select>
+            <button id="mobile-bar-btn-auto" class="btn-success" style="display:none;" onclick="runAutoAim()">&#9889; Auto-Aim</button>
+          </div>
+          <div id="mobile-bar-row2">
+            <button class="btn-primary" onclick="launch()">&#128640; FIRE</button>
+            <button onclick="launchVolley()">SALVO &#215;5</button>
+            <button id="mobile-btn-pause" onclick="togglePause()" >&#9646;&#9646; PAUSE</button>
+          </div>
+        </div>
+
+        <div class="stats-bar">
+          <div class="stat"><div class="stat-label">Max Height</div><div><span class="stat-val" id="st-maxh">&#8212;</span> <span class="stat-unit">m</span></div></div>
+          <div class="stat"><div class="stat-label">Ground Range</div><div><span class="stat-val" id="st-range">&#8212;</span> <span class="stat-unit">m</span></div></div>
+          <div class="stat"><div class="stat-label">Flight Time</div><div><span class="stat-val" id="st-time">&#8212;</span> <span class="stat-unit">s</span></div></div>
+          <div class="stat"><div class="stat-label">Intercepted</div><div><span class="stat-val" id="st-kills">0</span></div></div>
+        </div>
+
+        <div class="graphs-row">
+          <div class="graph-wrap" onclick="openGraph('g-vy')"><div class="graph-label">Vy / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-vy"></canvas></div>
+          <div class="graph-wrap" onclick="openGraph('g-vx')"><div class="graph-label">Vx / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-vx"></canvas></div>
+          <div class="graph-wrap" onclick="openGraph('g-hd')"><div class="graph-label">Height / dist</div><div class="graph-expand">&#x26F6;</div><canvas id="g-hd"></canvas></div>
+          <div class="graph-wrap" onclick="openGraph('g-sp')"><div class="graph-label">Speed / time</div><div class="graph-expand">&#x26F6;</div><canvas id="g-sp"></canvas></div>
+        </div>
+      </div>
 
     </div>
 
     <!-- Graph expand modal -->
     <div id="graph-modal">
-        <div id="graph-modal-backdrop" onclick="closeGraph()"></div>
-        <div id="graph-modal-inner">
-            <div id="graph-modal-title">GRAPH</div>
-            <button id="graph-modal-close" onclick="closeGraph()">&#x2715;</button>
-            <canvas id="graph-modal-canvas"></canvas>
-            <div id="graph-modal-hint">LIVE — updates in real time &nbsp;&#8226;&nbsp; click backdrop or press ESC to close</div>
-        </div>
+      <div id="graph-modal-backdrop" onclick="closeGraph()"></div>
+      <div id="graph-modal-inner">
+        <div id="graph-modal-title">GRAPH</div>
+        <button id="graph-modal-close" onclick="closeGraph()">&#x2715;</button>
+        <canvas id="graph-modal-canvas"></canvas>
+        <div id="graph-modal-hint">LIVE — updates in real time &nbsp;&#8226;&nbsp; click backdrop or press ESC to close</div>
+      </div>
     </div>
     <script src="main.js"></script>
 </body>
